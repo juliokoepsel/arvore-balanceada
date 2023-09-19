@@ -95,7 +95,7 @@ public class ArvoreAVL {
     private Nodo rotacaoEsquerda(Nodo raiz) {
         Nodo aux1, aux2;
         aux1 = raiz.dir;
-        aux2 = raiz.esq;
+        aux2 = aux1.esq;
         raiz.dir = aux2;
         aux1.esq = raiz;
         if (raiz.dir == null) {
@@ -120,9 +120,123 @@ public class ArvoreAVL {
     private void mostrandoOrdenado(Nodo raiz) {
         if (raiz != null) {
             mostrandoOrdenado(raiz.esq);
-            System.out.println(raiz.dado);
+            System.out.print(raiz.dado + "(" + (raiz.altd - raiz.alte) + ")" + " ");
             mostrandoOrdenado(raiz.dir);
         }
+    }
+
+    //2) Exclusão:
+    public void delete(int dado) {
+        raiz = deleteDado(raiz, dado);
+    }
+    private Nodo minValorNodo(Nodo raiz) {
+        while (raiz.esq != null)
+            raiz = raiz.esq;
+        return raiz;
+    }
+    private Nodo deleteDado(Nodo raiz, int dado) {
+        if (raiz == null)
+            return raiz;
+
+        if (dado < raiz.dado) {
+            raiz.esq = deleteDado(raiz.esq, dado);
+        } else if (dado > raiz.dado) {
+            raiz.dir = deleteDado(raiz.dir, dado);
+        } else {
+            if ((raiz.esq == null) || (raiz.dir == null)) {
+                Nodo temp = null;
+                if (temp == raiz.esq)
+                    temp = raiz.dir;
+                else
+                    temp = raiz.esq;
+                if (temp == null) {
+                    temp = raiz;
+                    raiz = null;
+                 } else
+                    raiz = temp;  
+            } else {
+                Nodo temp = minValorNodo(raiz.dir);
+ 
+                raiz.dado = temp.dado;
+ 
+                raiz.dir = deleteDado(raiz.dir, temp.dado);
+            }
+        }
+ 
+        if (raiz == null)
+            return raiz;
+
+        int altura = 0;
+        Nodo aux = raiz.dir;
+        while (aux != null) {
+            altura++;
+            if (aux.alte > aux.altd) {
+                aux = aux.esq;
+            } else {
+                aux = aux.dir;
+            }
+        }
+        raiz.altd = altura;
+
+        altura = 0;
+        aux = raiz.esq;
+        while (aux != null) {
+           altura++;
+            if (aux.alte > aux.altd) {
+                aux = aux.esq;
+            } else {
+                aux = aux.dir;
+            }
+        }
+        raiz.alte = altura;
+ 
+        raiz = balanceamento(raiz);
+ 
+        return raiz;
+    }
+
+    //3) Verificar se AVL:
+    public void verificarAVL() {
+        if (verificarArvoreAVL(raiz)) {
+            System.out.println("A árvore é AVL!");
+        } else {
+            System.out.println("A árvore não é AVL!");
+        }
+    }
+    private boolean verificarArvoreAVL(Nodo raiz) {
+        if (raiz != null) {
+            if (verificarArvoreAVL(raiz.esq) && verificarArvoreAVL(raiz.dir) && (raiz.altd - raiz.alte) >= -1 && (raiz.altd - raiz.alte) <= 1) {
+                return true;
+            } else {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    //4) Números primos:
+    public void primos() {
+        System.out.println(calcularPrimos(raiz) + " números primos!");
+    }
+    private boolean isPrime(int num) {
+        if (num<=1) {
+            return false;
+        }
+       for (int i=2; i<=num/2 ;i++) {
+           if ((num % i) == 0)
+               return  false;
+       }
+       return true;
+    }
+    private int calcularPrimos(Nodo raiz) {
+        if (raiz != null) {
+            if (isPrime(raiz.dado)) {
+                return calcularPrimos(raiz.esq) + calcularPrimos(raiz.dir) + 1;
+            } else {
+                return calcularPrimos(raiz.esq) + calcularPrimos(raiz.dir);
+            }
+        }
+        return 0;
     }
 
 }
