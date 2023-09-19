@@ -1,28 +1,30 @@
 package arvores;
 
-public class ArvoreAVL {
-
+public class ArvoreAVLQuantidade {
+    
+    //5) Novo Nodo com a variável quantidade:
     private class Nodo {
-        private int dado, altd, alte;
+        private int quantidade, dado, altd, alte;
         private Nodo dir, esq;
 
         public Nodo(int dado) {
             this.dado = dado;
             dir = esq = null;
             altd = alte = 0;
+            quantidade = 1;
         }
     }
 
     Nodo raiz;
 
-    public ArvoreAVL() {
+    public ArvoreAVLQuantidade() {
         raiz = null;
     }
 
+    //5) Nova inserção com quantidade:
     public void inserir(int dado) {
         raiz = inserirDado(raiz, dado);
     }
-
     private Nodo inserirDado(Nodo raiz, int dado) {
         if (raiz == null) {
             raiz = new Nodo(dado);
@@ -44,6 +46,8 @@ public class ArvoreAVL {
                 raiz.altd = raiz.dir.alte + 1;
             }
             raiz = balanceamento(raiz);
+        } else {
+            raiz.quantidade++;
         }
         return raiz;
     }
@@ -113,19 +117,19 @@ public class ArvoreAVL {
         return aux1;
     }
 
+    //5) Nova função para mostrar com quantidade:
     public void mostrarEmOrdem() {
         mostrandoOrdenado(raiz);
     }
-
     private void mostrandoOrdenado(Nodo raiz) {
         if (raiz != null) {
             mostrandoOrdenado(raiz.esq);
-            System.out.print(raiz.dado + "(" + (raiz.altd - raiz.alte) + ")" + " ");
+            System.out.print(raiz.quantidade + "x" + raiz.dado + "(" + (raiz.altd - raiz.alte) + ")" + " ");
             mostrandoOrdenado(raiz.dir);
         }
     }
 
-    //2) Exclusão:
+    //5) Nova função para exclusão com quantidade:
     public void delete(int dado) {
         raiz = deleteDado(raiz, dado);
     }
@@ -143,23 +147,28 @@ public class ArvoreAVL {
         } else if (dado > raiz.dado) {
             raiz.dir = deleteDado(raiz.dir, dado);
         } else {
-            if ((raiz.esq == null) || (raiz.dir == null)) {
-                Nodo temp = null;
-                if (temp == raiz.esq)
-                    temp = raiz.dir;
-                else
-                    temp = raiz.esq;
-                if (temp == null) {
-                    temp = raiz;
-                    raiz = null;
-                 } else
-                    raiz = temp;  
+            if (raiz.quantidade > 1) {
+                raiz.quantidade--;
             } else {
-                Nodo temp = minValorNodo(raiz.dir);
- 
-                raiz.dado = temp.dado;
- 
-                raiz.dir = deleteDado(raiz.dir, temp.dado);
+                if ((raiz.esq == null) || (raiz.dir == null)) {
+                    Nodo temp = null;
+                    if (temp == raiz.esq)
+                        temp = raiz.dir;
+                    else
+                        temp = raiz.esq;
+                    if (temp == null) {
+                        temp = raiz;
+                        raiz = null;
+                    } else
+                        raiz = temp;  
+                } else {
+                    Nodo temp = minValorNodo(raiz.dir);
+    
+                    raiz.dado = temp.dado;
+                    raiz.quantidade = temp.quantidade;
+    
+                    raiz.dir = deleteDado(raiz.dir, temp.dado);
+                }
             }
         }
  
@@ -193,90 +202,6 @@ public class ArvoreAVL {
         raiz = balanceamento(raiz);
  
         return raiz;
-    }
-
-    //3) Verificar se AVL:
-    public void verificarAVL() {
-        if (verificarArvoreAVL(raiz)) {
-            System.out.println("A árvore é AVL!");
-        } else {
-            System.out.println("A árvore não é AVL!");
-        }
-    }
-    private boolean verificarArvoreAVL(Nodo raiz) {
-        if (raiz != null) {
-            if (verificarArvoreAVL(raiz.esq) && verificarArvoreAVL(raiz.dir) && (raiz.altd - raiz.alte) >= -1 && (raiz.altd - raiz.alte) <= 1) {
-                return true;
-            } else {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    //4) Números primos:
-    public void primos() {
-        if (verificarArvoreAVL(raiz))
-            System.out.println(calcularPrimos(raiz) + " números primos!");
-        else
-            System.out.println("A quantidade de números primos não foi calculada, pois a árvore não é AVL!");
-    }
-    private boolean isPrime(int num) {
-        if (num<=1) {
-            return false;
-        }
-       for (int i=2; i<=num/2 ;i++) {
-           if ((num % i) == 0)
-               return  false;
-       }
-       return true;
-    }
-    private int calcularPrimos(Nodo raiz) {
-        if (raiz != null) {
-            if (isPrime(raiz.dado)) {
-                return calcularPrimos(raiz.esq) + calcularPrimos(raiz.dir) + 1;
-            } else {
-                return calcularPrimos(raiz.esq) + calcularPrimos(raiz.dir);
-            }
-        }
-        return 0;
-    }
-
-    //6) Nodos de um nível:
-    public void mostrarNodosNivel(int nivel) {
-        mostrarNodosNivel(raiz, nivel);
-    }
-    private void mostrarNodosNivel(Nodo nodo, int nivel) {
-        if (nodo == null)
-            return;
-
-        if (nivel == 1) {
-            System.out.print(nodo.dado + "(" + (nodo.altd - nodo.alte) + ")" + " ");
-        } else if (nivel > 1) {
-            mostrarNodosNivel(nodo.esq, nivel - 1);
-            mostrarNodosNivel(nodo.dir, nivel - 1);
-        }
-    }
-
-    //7) Quantidade de nós nos nodos ímpares:
-    public void somaNodoNivelImpar() {
-        System.out.println(somaNodoNivelImpar(raiz, 1));
-    }
-    private int somaNodoNivelImpar(Nodo nodo, int nivel) {
-        if (nodo == null) {
-            return 0;
-        }
-
-        int sum = 0;
-
-        if (nivel % 2 != 0) {
-            sum++;
-        }
-
-        sum += somaNodoNivelImpar(nodo.esq, nivel + 1);
-        sum += somaNodoNivelImpar(nodo.dir, nivel + 1);
-
-        return sum;
     }
 
 }

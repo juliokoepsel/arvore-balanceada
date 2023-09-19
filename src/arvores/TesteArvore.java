@@ -16,6 +16,10 @@ public class TesteArvore {
         arvore.inserir(9);
         arvore.inserir(12);
 
-        arvore.primos();
+        arvore.mostrarEmOrdem();
+        System.out.println();
+
+        arvore.somaNodoNivelImpar();
+        System.out.println();
     }
 }
